@@ -2,6 +2,20 @@ plugins {
     id 'fabric-loom'
 }
 
+// Exposes this module's Java sources and resources as consumable configurations so
+// that platform modules (e.g. fabric) can compile them directly into their own jar,
+// instead of depending on a separate common.jar at runtime.
+configurations {
+    commonJava {
+        canBeConsumed = true
+        canBeResolved = false
+    }
+    commonResources {
+        canBeConsumed = true
+        canBeResolved = false
+    }
+}
+
 sourceSets {
     main {
         java {
@@ -38,4 +52,13 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+artifacts {
+    sourceSets.main.java.srcDirs.each { dir ->
+        add('commonJava', dir)
+    }
+    sourceSets.main.resources.srcDirs.each { dir ->
+        add('commonResources', dir)
+    }
 }

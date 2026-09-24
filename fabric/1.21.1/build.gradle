@@ -2,11 +2,65 @@ plugins {
     id 'fabric-loom'
 }
 
+configurations {
+    commonJava { canBeResolved = true }
+    commonResources { canBeResolved = true }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    modImplementation include("com.electronwill.night-config:core:3.8.3")
+    modImplementation include("com.electronwill.night-config:toml:3.8.3")
 
     compileOnly project(':common')
+
+    commonJava project(path: ':common', configuration: 'commonJava')
+    commonResources project(path: ':common', configuration: 'commonResources')
+}
+
+tasks.named('compileJava') {
+    dependsOn configurations.commonJava
+    source configurations.commonJava
+}
+
+tasks.named('processResources') {
+    dependsOn configurations.commonResources
+    from configurations.commonResources
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    inputs.property 'version', project.version
+    inputs.property 'minecraft_version', project.ext.minecraft_version
+    inputs.property 'fabric_loader_version', project.ext.fabric_loader_version
+    filesMatching('fabric.mod.json') {
+        expand(
+            version: project.version,
+            minecraft_version: project.ext.minecraft_version,
+            fabric_loader_version: project.ext.fabric_loader_version,
+        )
+    }
+}
+
+loom {
+    runs {
+        client { client(); runDir("run") }
+        server { server(); runDir("run") }
+    }
+}
+
+jar {
+    archiveBaseName = rootProject.archives_name
+    archiveVersion = "${rootProject.mod_version}+${minecraft_version}-fabric"
+    archiveClassifier = 'dev'
+}
+remapJar {
+    archiveBaseName = rootProject.archives_name
+    archiveVersion = "${rootProject.mod_version}+${minecraft_version}-fabric"
+    archiveClassifier = null
+}
+sourcesJar {
+    archiveBaseName = rootProject.archives_name
+    archiveVersion = "${rootProject.mod_version}+${minecraft_version}-fabric"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
