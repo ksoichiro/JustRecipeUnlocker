@@ -1,0 +1,36 @@
+pluginManagement {
+    repositories {
+        maven { url 'https://maven.fabricmc.net/' }
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'JustRecipeUnlocker'
+
+def targetMcVersion = settings.providers.gradleProperty('target_mc_version').getOrNull()
+if (targetMcVersion == null) {
+    throw new GradleException("'target_mc_version' property is not defined. Check gradle.properties or pass -Ptarget_mc_version=<version>")
+}
+
+include 'common'
+project(':common').projectDir = file("common/${targetMcVersion}")
+
+def propsFile = file("props/${targetMcVersion}.properties")
+if (!propsFile.exists()) {
+    throw new GradleException("Version properties not found: ${propsFile.absolutePath}")
+}
+def props = new Properties()
+propsFile.withInputStream { props.load(it) }
+def enabledPlatforms = props.getProperty('enabled_platforms', '').split(',')
+
+enabledPlatforms.each { platform ->
+    platform = platform.trim()
+    if (platform) {
+        include platform
+        project(":${platform}").projectDir = file("${platform}/${targetMcVersion}")
+    }
+}
