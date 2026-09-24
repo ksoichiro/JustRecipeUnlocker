@@ -46,12 +46,16 @@ class ConfigLoaderTest {
     }
 
     @Test
-    void fallsBackToDefaultsOnMalformedToml(@TempDir Path tempDir) throws IOException {
+    void disablesUnlockOnJoinWhenExistingTomlIsMalformed(@TempDir Path tempDir) throws IOException {
         Files.writeString(tempDir.resolve("justrecipeunlocker.toml"), "not = [valid toml");
 
         JustRecipeUnlockerConfig config = ConfigLoader.load(tempDir);
 
-        assertTrue(config.unlockOnJoin());
+        // A malformed config that already existed (as opposed to a first-run missing file) must
+        // not silently fall back to unlock-everything; it should disable join-time unlock until
+        // the admin fixes the file.
+        assertFalse(config.unlockOnJoin());
         assertTrue(config.excludedNamespaces().isEmpty());
+        assertTrue(config.excludedRecipeIds().isEmpty());
     }
 }

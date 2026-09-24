@@ -24,8 +24,16 @@ public final class ConfigLoader {
 
     public static JustRecipeUnlockerConfig load(Path configDir) {
         Path configFile = configDir.resolve(CONFIG_FILE_NAME);
+        boolean fileExistedBeforeLoad;
         try {
+            fileExistedBeforeLoad = Files.exists(configFile);
             ensureConfigFileExists(configDir, configFile);
+        } catch (Exception e) {
+            LOGGER.error("Failed to prepare {}; using built-in defaults", configFile, e);
+            return ConfigDefaults.defaults();
+        }
+
+        try {
             CommentedConfig parsed;
             try (InputStream in = Files.newInputStream(configFile)) {
                 parsed = new TomlParser().parse(in);
@@ -38,6 +46,14 @@ public final class ConfigLoader {
                     readBoolean(parsed, "suppress_tutorial_toast", false)
             );
         } catch (Exception e) {
+            if (fileExistedBeforeLoad) {
+                // The file existed but failed to parse (e.g. a typo introduced by an admin who
+                // may have already configured exclusions). Falling back to normal defaults here
+                // would silently re-enable unlock-everything; disable join-time unlock instead
+                // until the admin fixes the file.
+                LOGGER.error("Failed to parse {}; disabling unlock_on_join until the config is fixed", configFile, e);
+                return new JustRecipeUnlockerConfig(false, List.of(), List.of(), false, false);
+            }
             LOGGER.error("Failed to load {}; using built-in defaults", configFile, e);
             return ConfigDefaults.defaults();
         }

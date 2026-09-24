@@ -12,5 +12,7 @@ excluded_recipe_ids = []
 # Suppress the "New recipes unlocked!" toast notification.
 suppress_recipe_toast = false
 
-# Suppress recipe-related tutorial toast notifications.
+# Currently has no effect: the vanilla tutorial hint (e.g. "craft planks") is driven entirely
+# by client-side state with no server-sent signal to suppress it. Kept for forward/config
+# compatibility only.
 suppress_tutorial_toast = false

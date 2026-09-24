@@ -1,7 +1,7 @@
 # Just Recipe Unlocker
 
 Unlocks all crafting recipes for players on join. A lightweight,
-server-installed mod — no client-side mod required.
+server-installed mod, no client-side mod required.
 
 ## Configuration
 
@@ -14,13 +14,13 @@ on first run:
 | `excluded_namespaces` | `[]` | Exclude all recipes from these mod ids/namespaces |
 | `excluded_recipe_ids` | `[]` | Exclude individual recipes by `namespace:path` id |
 | `suppress_recipe_toast` | `false` | Suppress the "New recipes unlocked!" toast |
-| `suppress_tutorial_toast` | `false` | Suppress recipe-related tutorial toasts |
+| `suppress_tutorial_toast` | `false` | Currently has no effect (reserved for future/config compatibility) |
 
 ## Commands
 
-- `/justrecipeunlocker unlock <targets>` — unlock recipes for the given player(s) (op level 2)
-- `/justrecipeunlocker unlockAll` — unlock recipes for all online players (op level 2)
-- `/jru` — alias for `/justrecipeunlocker`
+- `/justrecipeunlocker unlock <targets>`, unlock recipes for the given player(s) (op level 2)
+- `/justrecipeunlocker unlockAll`, unlock recipes for all online players (op level 2)
+- `/jru`, alias for `/justrecipeunlocker`
 
 Currently supports Minecraft 1.21.1 on Fabric.
 

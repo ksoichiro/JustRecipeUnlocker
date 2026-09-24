@@ -63,4 +63,5 @@ sourcesJar {
     archiveBaseName = rootProject.archives_name
     archiveVersion = "${rootProject.mod_version}+${minecraft_version}-fabric"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from configurations.commonJava
 }
