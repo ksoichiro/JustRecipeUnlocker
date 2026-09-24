@@ -3,6 +3,13 @@ pluginManagement {
         maven { url 'https://maven.fabricmc.net/' }
         gradlePluginPortal()
     }
+
+    def fabricLoomVersion = settings.providers.gradleProperty('fabric_loom_version').getOrNull()
+    if (fabricLoomVersion != null) {
+        plugins {
+            id 'fabric-loom' version fabricLoomVersion
+        }
+    }
 }
 
 plugins {
