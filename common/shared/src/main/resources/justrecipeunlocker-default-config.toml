@@ -1,0 +1,16 @@
+# Just Recipe Unlocker configuration
+
+# Unlock all non-excluded recipes for a player when they join the server.
+unlock_on_join = true
+
+# Exclude recipes in bulk by namespace (mod id).
+excluded_namespaces = []
+
+# Exclude individual recipes by id (namespace:path).
+excluded_recipe_ids = []
+
+# Suppress the "New recipes unlocked!" toast notification.
+suppress_recipe_toast = false
+
+# Suppress recipe-related tutorial toast notifications.
+suppress_tutorial_toast = false
