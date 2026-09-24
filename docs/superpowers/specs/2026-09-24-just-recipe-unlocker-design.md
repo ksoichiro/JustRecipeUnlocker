@@ -37,13 +37,17 @@ client works out of the box).
 
 ## Architecture
 
-The mod uses a multi-loader build (Fabric, NeoForge, Forge) built with
-Architectury Loom, without Mixin. Architectury Loom is a build-time-only
-Gradle plugin (a fork of Fabric Loom) that lets a single source tree target
-multiple loaders; it introduces no runtime dependency on any third-party API
-mod. The only runtime mod dependency is Fabric API on the Fabric build,
-which is the de facto standard dependency for Fabric mods and is used here
-to detect player join events.
+The mod uses a multi-loader build (Fabric, NeoForge, Forge), without Mixin.
+Each loader uses its own standard, loader-native Gradle toolchain: plain
+`fabric-loom` for Fabric, and ModDevGradle/ForgeGradle for NeoForge/Forge
+(added in later phases). Source sharing across loaders is done through
+plain Gradle project structure (a `common/<version>` module consumed by
+each loader module, plus a version-independent `common/shared` source set),
+not through a forked-Loom multiloader tool. This is a build-time-only
+concern; none of these tools introduce a runtime dependency on any
+third-party API mod. The only runtime mod dependency is Fabric API on the
+Fabric build, which is the de facto standard dependency for Fabric mods and
+is used here to detect player join events.
 
 Recipe unlocking and exclusion filtering are implemented entirely with
 vanilla public APIs (`RecipeManager`, `ServerPlayer#getRecipeBook()`, etc.).
