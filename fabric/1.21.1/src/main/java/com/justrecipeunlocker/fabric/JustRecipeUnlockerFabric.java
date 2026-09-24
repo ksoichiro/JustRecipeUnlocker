@@ -36,7 +36,7 @@ public final class JustRecipeUnlockerFabric implements ModInitializer {
             ServerPlayer player = handler.getPlayer();
             RecipeUnlockService service = new RecipeUnlockService(server.getRecipeManager());
             List<ResourceLocation> recipeIds = service.resolveUnlockableRecipeIds(config);
-            service.unlock(player, recipeIds);
+            service.unlock(player, recipeIds, config.suppressRecipeToast());
         });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -48,7 +48,7 @@ public final class JustRecipeUnlockerFabric implements ModInitializer {
                         List<ResourceLocation> recipeIds = service.resolveUnlockableRecipeIds(config);
                         Collection<ServerPlayer> targets = server.getPlayerList().getPlayers();
                         for (ServerPlayer player : targets) {
-                            service.unlock(player, recipeIds);
+                            service.unlock(player, recipeIds, config.suppressRecipeToast());
                         }
                         ctx.getSource().sendSuccess(
                                 () -> Component.literal("Unlocked recipes for " + targets.size() + " player(s)."), true);
@@ -61,7 +61,7 @@ public final class JustRecipeUnlockerFabric implements ModInitializer {
                                         new RecipeUnlockService(ctx.getSource().getServer().getRecipeManager());
                                 List<ResourceLocation> recipeIds = service.resolveUnlockableRecipeIds(config);
                                 for (ServerPlayer player : targets) {
-                                    service.unlock(player, recipeIds);
+                                    service.unlock(player, recipeIds, config.suppressRecipeToast());
                                 }
                                 ctx.getSource().sendSuccess(
                                         () -> Component.literal("Unlocked recipes for " + targets.size() + " player(s)."), true);

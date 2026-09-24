@@ -28,7 +28,19 @@ public final class RecipeUnlockService {
         return recipeIds;
     }
 
-    public void unlock(ServerPlayer player, List<ResourceLocation> recipeIds) {
-        player.awardRecipesByKey(recipeIds);
+    public void unlock(ServerPlayer player, List<ResourceLocation> recipeIds, boolean suppressToast) {
+        if (suppressToast) {
+            unlockSilently(player, recipeIds);
+        } else {
+            player.awardRecipesByKey(recipeIds);
+        }
+    }
+
+    private void unlockSilently(ServerPlayer player, List<ResourceLocation> recipeIds) {
+        var recipeBook = player.getRecipeBook();
+        for (ResourceLocation id : recipeIds) {
+            recipeManager.byKey(id).ifPresent(recipeBook::add);
+        }
+        recipeBook.sendInitialRecipeBook(player);
     }
 }
