@@ -10,6 +10,13 @@ pluginManagement {
             id 'fabric-loom' version fabricLoomVersion
         }
     }
+
+    def neoForgeModDevVersion = settings.providers.gradleProperty('neoforge_moddev_version').getOrNull()
+    if (neoForgeModDevVersion != null) {
+        plugins {
+            id 'net.neoforged.moddev' version neoForgeModDevVersion
+        }
+    }
 }
 
 plugins {

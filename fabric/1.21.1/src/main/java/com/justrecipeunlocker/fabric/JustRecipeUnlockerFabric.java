@@ -27,16 +27,23 @@ public final class JustRecipeUnlockerFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        config = ConfigLoader.load(FabricLoader.getInstance().getConfigDir().resolve(MOD_ID));
+        config = ConfigLoader.load(FabricLoader.getInstance().getConfigDir());
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if (!config.unlockOnJoin()) {
                 return;
             }
             ServerPlayer player = handler.getPlayer();
-            RecipeUnlockService service = new RecipeUnlockService(server.getRecipeManager());
-            List<ResourceLocation> recipeIds = service.resolveUnlockableRecipeIds(config);
-            service.unlock(player, recipeIds, config.suppressRecipeToast());
+            // Fabric fires JOIN before vanilla sends the recipe list to the client. Deferring
+            // one server task preserves packet order so an ADD packet can create recipe toasts.
+            server.execute(() -> {
+                if (server.getPlayerList().getPlayer(player.getUUID()) != player) {
+                    return;
+                }
+                RecipeUnlockService service = new RecipeUnlockService(server.getRecipeManager());
+                List<ResourceLocation> recipeIds = service.resolveUnlockableRecipeIds(config);
+                service.unlock(player, recipeIds, config.suppressRecipeToast());
+            });
         });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
