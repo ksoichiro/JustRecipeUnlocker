@@ -17,12 +17,12 @@ dependencies {
     modImplementation include("com.electronwill.night-config:core:3.8.3")
     modImplementation include("com.electronwill.night-config:toml:3.8.3")
 
-    compileOnly project(':common')
+    compileOnly project(':common-1.21.1')
 
-    commonJava project(path: ':common', configuration: 'commonJava')
-    commonResources project(path: ':common', configuration: 'commonResources')
-    gametestJava project(path: ':common', configuration: 'gametestJava')
-    gametestResources project(path: ':common', configuration: 'gametestResources')
+    commonJava project(path: ':common-1.21.1', configuration: 'commonJava')
+    commonResources project(path: ':common-1.21.1', configuration: 'commonResources')
+    gametestJava project(path: ':common-1.21.1', configuration: 'gametestJava')
+    gametestResources project(path: ':common-1.21.1', configuration: 'gametestResources')
 }
 
 tasks.named('compileJava') {

@@ -30,8 +30,9 @@ if (targetMcVersion == null) {
     throw new GradleException("'target_mc_version' property is not defined. Check gradle.properties or pass -Ptarget_mc_version=<version>")
 }
 
-include 'common'
-project(':common').projectDir = file("common/${targetMcVersion}")
+def commonProject = "common-${targetMcVersion}"
+include commonProject
+project(":${commonProject}").projectDir = file("common/${targetMcVersion}")
 
 def propsFile = file("props/${targetMcVersion}.properties")
 if (!propsFile.exists()) {

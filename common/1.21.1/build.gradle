@@ -30,11 +30,9 @@ configurations {
 sourceSets {
     main {
         java {
-            srcDir 'src/main/java'
             srcDir '../shared/src/main/java'
         }
         resources {
-            srcDir 'src/main/resources'
             srcDir '../shared/src/main/resources'
         }
     }

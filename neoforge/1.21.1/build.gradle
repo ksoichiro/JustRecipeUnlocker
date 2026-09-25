@@ -15,13 +15,13 @@ dependencies {
     jarJar "com.electronwill.night-config:core:[3.8.3,3.8.4)"
     jarJar "com.electronwill.night-config:toml:[3.8.3,3.8.4)"
 
-    commonJava project(path: ':common', configuration: 'commonJava')
-    commonResources project(path: ':common', configuration: 'commonResources')
+    commonJava project(path: ':common-1.21.1', configuration: 'commonJava')
+    commonResources project(path: ':common-1.21.1', configuration: 'commonResources')
     // NeoForge (unlike Fabric) has no dedicated test-only source set/jar split here, so the
     // shared GameTest logic is compiled straight into main, same as the fabric.mod.json-free
     // registration class below.
-    gametestJava project(path: ':common', configuration: 'gametestJava')
-    gametestResources project(path: ':common', configuration: 'gametestResources')
+    gametestJava project(path: ':common-1.21.1', configuration: 'gametestJava')
+    gametestResources project(path: ':common-1.21.1', configuration: 'gametestResources')
 }
 
 tasks.named('compileJava') {

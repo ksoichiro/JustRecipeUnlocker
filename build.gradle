@@ -51,3 +51,4 @@ if (!file('gradle/shared/multi-version-tasks.gradle').exists()) {
     throw new GradleException("Shared Gradle scripts not found. Run: git submodule update --init")
 }
 apply from: 'gradle/shared/multi-version-tasks.gradle'
+apply from: 'gradle/shared/resource-validation.gradle'
