@@ -5,6 +5,8 @@ plugins {
 configurations {
     commonJava { canBeResolved = true }
     commonResources { canBeResolved = true }
+    gametestJava { canBeResolved = true }
+    gametestResources { canBeResolved = true }
 }
 
 dependencies {
@@ -15,16 +17,22 @@ dependencies {
 
     commonJava project(path: ':common', configuration: 'commonJava')
     commonResources project(path: ':common', configuration: 'commonResources')
+    // NeoForge (unlike Fabric) has no dedicated test-only source set/jar split here, so the
+    // shared GameTest logic is compiled straight into main, same as the fabric.mod.json-free
+    // registration class below.
+    gametestJava project(path: ':common', configuration: 'gametestJava')
+    gametestResources project(path: ':common', configuration: 'gametestResources')
 }
 
 tasks.named('compileJava') {
-    dependsOn configurations.commonJava
-    source configurations.commonJava
+    dependsOn configurations.commonJava, configurations.gametestJava
+    source configurations.commonJava, configurations.gametestJava
 }
 
 tasks.named('processResources') {
-    dependsOn configurations.commonResources
+    dependsOn configurations.commonResources, configurations.gametestResources
     from configurations.commonResources
+    from configurations.gametestResources
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     inputs.property 'version', project.version
     inputs.property 'minecraft_version', project.ext.minecraft_version
@@ -47,6 +55,15 @@ neoForge {
         client { client() }
         server {
             server()
+            programArgument '--nogui'
+        }
+        // "gameTestServer" is a run type defined by NeoForge's own userdev config (see
+        // neoforge-<version>-moddev-config.json); it enables neoforge.enableGameTest and
+        // neoforge.gameTestServer automatically, we just scope it to our namespace and
+        // suppress the GUI.
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'justrecipeunlocker'
             programArgument '--nogui'
         }
     }

@@ -5,6 +5,8 @@ plugins {
 configurations {
     commonJava { canBeResolved = true }
     commonResources { canBeResolved = true }
+    gametestJava { canBeResolved = true }
+    gametestResources { canBeResolved = true }
 }
 
 dependencies {
@@ -19,6 +21,8 @@ dependencies {
 
     commonJava project(path: ':common', configuration: 'commonJava')
     commonResources project(path: ':common', configuration: 'commonResources')
+    gametestJava project(path: ':common', configuration: 'gametestJava')
+    gametestResources project(path: ':common', configuration: 'gametestResources')
 }
 
 tasks.named('compileJava') {
@@ -47,6 +51,28 @@ loom {
         client { client(); runDir("run") }
         server { server(); runDir("run") }
     }
+}
+
+// GameTest Framework configuration (server-side only for now).
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "justrecipeunlocker-test"
+        enableGameTests = true
+        enableClientGameTests = false
+        eula = true
+    }
+}
+
+// Pull in the shared, platform-agnostic GameTest logic exposed by :common.
+tasks.named('compileGametestJava') {
+    dependsOn configurations.gametestJava
+    source configurations.gametestJava
+}
+tasks.named('processGametestResources') {
+    dependsOn configurations.gametestResources
+    from configurations.gametestResources
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 jar {
