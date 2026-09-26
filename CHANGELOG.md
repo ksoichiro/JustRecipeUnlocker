@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Minecraft 1.21.3, 1.21.4, 1.21.5, 1.21.6, 1.21.7, 1.21.8, 1.21.9, 1.21.10, and 1.21.11
+  support for Fabric and NeoForge (target versions chosen to match Just Coordinates'
+  supported 1.21.x releases).
+
+### Fixed
+
+- Fabric: recipes were not unlocked on player join on Minecraft 1.21.9/1.21.10 (confirmed via
+  real-server testing; the `/justrecipeunlocker unlockAll` command still worked). As on
+  26.1.2+, Fabric's JOIN event fires before the player is registered in the player list on
+  these versions. A first fix that reused the 26.1.2+ retry (a recursive `server.execute()`
+  poll) still failed real-server testing: `server.execute()` runs its task inline when called
+  from the server thread the JOIN event already fires on, so all 100 "ticks" of that retry ran
+  in zero elapsed real time and could never observe the later registration (confirmed with
+  temporary debug logging on a real dedicated server + client). Replaced it with a queue
+  processed once per genuine tick via `ServerTickEvents.END_SERVER_TICK`, which guarantees each
+  retry attempt runs on a separate real tick.
+- NeoForge: the mod failed to load at all on Minecraft 1.21.3/1.21.4 (confirmed via real-server
+  testing), crashing with `IllegalArgumentException: IModBusEvent events are not allowed on the
+  common NeoForge bus! Use a mod bus instead.` `RegisterGameTestsEvent` is a mod-bus-only event,
+  but the `@EventBusSubscriber`-annotated GameTest registration class relied on automatic bus
+  detection, which this NeoForge version validates more strictly than 1.21.1 (where the same
+  code loads without error). Replaced it with an explicit `modEventBus.addListener(...)` call
+  from the mod constructor, matching the pattern already used on 1.21.5+.
+
 ## [0.2.0] - 2026-09-26
 
 ### Added

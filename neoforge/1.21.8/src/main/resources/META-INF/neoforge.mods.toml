@@ -1,0 +1,23 @@
+modLoader="javafml"
+loaderVersion="${neoforge_loader_version_range}"
+license="LGPL-3.0-only"
+
+[[mods]]
+modId="justrecipeunlocker"
+version="${version}"
+displayName="Just Recipe Unlocker"
+description="Unlocks all crafting recipes for players on join."
+
+[[dependencies.justrecipeunlocker]]
+modId="neoforge"
+type="required"
+versionRange="[${neoforge_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.justrecipeunlocker]]
+modId="minecraft"
+type="required"
+versionRange="[${minecraft_version},1.22)"
+ordering="NONE"
+side="BOTH"

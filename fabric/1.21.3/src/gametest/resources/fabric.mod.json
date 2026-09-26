@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "justrecipeunlocker-test",
+  "version": "1.0.0",
+  "name": "Just Recipe Unlocker Tests",
+  "description": "GameTest tests for Just Recipe Unlocker",
+  "authors": [],
+  "contact": {},
+  "license": "All Rights Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "com.justrecipeunlocker.fabric.gametest.JustRecipeUnlockerGameTestsFabric"
+    ]
+  },
+  "depends": {
+    "justrecipeunlocker": "*",
+    "fabric-gametest-api-v1": "*"
+  }
+}

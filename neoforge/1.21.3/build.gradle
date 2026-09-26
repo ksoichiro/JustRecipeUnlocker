@@ -1,0 +1,89 @@
+plugins {
+    id 'net.neoforged.moddev'
+}
+
+configurations {
+    commonJava { canBeResolved = true }
+    commonResources { canBeResolved = true }
+    gametestJava { canBeResolved = true }
+    gametestResources { canBeResolved = true }
+}
+
+dependencies {
+    implementation "com.electronwill.night-config:core:3.8.3"
+    implementation "com.electronwill.night-config:toml:3.8.3"
+    jarJar "com.electronwill.night-config:core:[3.8.3,3.8.4)"
+    jarJar "com.electronwill.night-config:toml:[3.8.3,3.8.4)"
+
+    commonJava project(path: ':common-1.21.3', configuration: 'commonJava')
+    commonResources project(path: ':common-1.21.3', configuration: 'commonResources')
+    // NeoForge (unlike Fabric) has no dedicated test-only source set/jar split here, so the
+    // shared GameTest logic is compiled straight into main, same as the fabric.mod.json-free
+    // registration class below.
+    gametestJava project(path: ':common-1.21.3', configuration: 'gametestJava')
+    gametestResources project(path: ':common-1.21.3', configuration: 'gametestResources')
+}
+
+tasks.named('compileJava') {
+    dependsOn configurations.commonJava, configurations.gametestJava
+    source configurations.commonJava, configurations.gametestJava
+}
+
+tasks.named('processResources') {
+    dependsOn configurations.commonResources, configurations.gametestResources
+    from configurations.commonResources
+    from configurations.gametestResources
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    inputs.property 'version', project.version
+    inputs.property 'minecraft_version', project.ext.minecraft_version
+    inputs.property 'neoforge_version', project.ext.neoforge_version
+    inputs.property 'neoforge_loader_version_range', project.ext.neoforge_loader_version_range
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(
+            version: project.version,
+            minecraft_version: project.ext.minecraft_version,
+            neoforge_version: project.ext.neoforge_version,
+            neoforge_loader_version_range: project.ext.neoforge_loader_version_range,
+        )
+    }
+}
+
+neoForge {
+    version = neoforge_version
+
+    runs {
+        client { client() }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        // "gameTestServer" is a run type defined by NeoForge's own userdev config (see
+        // neoforge-<version>-moddev-config.json); it enables neoforge.enableGameTest and
+        // neoforge.gameTestServer automatically, we just scope it to our namespace and
+        // suppress the GUI.
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'justrecipeunlocker'
+            programArgument '--nogui'
+        }
+    }
+
+    mods {
+        justrecipeunlocker {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+jar {
+    archiveBaseName = rootProject.archives_name
+    archiveVersion = "${rootProject.mod_version}+${minecraft_version}-neoforge"
+    archiveClassifier = 'dev'
+}
+
+sourcesJar {
+    archiveBaseName = rootProject.archives_name
+    archiveVersion = "${rootProject.mod_version}+${minecraft_version}-neoforge"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from configurations.commonJava
+}
