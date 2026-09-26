@@ -1,0 +1,91 @@
+plugins {
+    // Minecraft 26.2 ships unobfuscated: the legacy 'fabric-loom' plugin cannot resolve
+    // mappings for it (there are none). Use Fabric's new no-remap toolchain plugin instead.
+    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+}
+
+configurations {
+    commonJava { canBeResolved = true }
+    commonResources { canBeResolved = true }
+    gametestJava { canBeResolved = true }
+    gametestResources { canBeResolved = true }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    api "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    implementation include("com.electronwill.night-config:core:3.8.3")
+    implementation include("com.electronwill.night-config:toml:3.8.3")
+
+    compileOnly project(':common-26.2')
+
+    commonJava project(path: ':common-26.2', configuration: 'commonJava')
+    commonResources project(path: ':common-26.2', configuration: 'commonResources')
+    gametestJava project(path: ':common-26.2', configuration: 'gametestJava')
+    gametestResources project(path: ':common-26.2', configuration: 'gametestResources')
+}
+
+tasks.named('compileJava') {
+    dependsOn configurations.commonJava
+    source configurations.commonJava
+}
+
+tasks.named('processResources') {
+    dependsOn configurations.commonResources
+    from configurations.commonResources
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    inputs.property 'version', project.version
+    inputs.property 'minecraft_version', project.ext.minecraft_version
+    inputs.property 'fabric_loader_version', project.ext.fabric_loader_version
+    filesMatching('fabric.mod.json') {
+        expand(
+            version: project.version,
+            minecraft_version: project.ext.minecraft_version,
+            fabric_loader_version: project.ext.fabric_loader_version,
+        )
+    }
+}
+
+loom {
+    runs {
+        client { client(); runDir("run") }
+        server { server(); runDir("run") }
+    }
+}
+
+// GameTest Framework configuration (server-side only for now).
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "justrecipeunlocker-test"
+        enableGameTests = true
+        enableClientGameTests = false
+        eula = true
+    }
+}
+
+// Pull in the shared, platform-agnostic GameTest logic exposed by :common.
+tasks.named('compileGametestJava') {
+    dependsOn configurations.gametestJava
+    source configurations.gametestJava
+}
+tasks.named('processGametestResources') {
+    dependsOn configurations.gametestResources
+    from configurations.gametestResources
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// Minecraft 26.2 ships unobfuscated: there is no remap step, so the plain 'jar' task
+// output is already the final artifact (no separate remapJar task exists here).
+jar {
+    archiveBaseName = rootProject.archives_name
+    archiveVersion = "${rootProject.mod_version}+${minecraft_version}-fabric"
+    archiveClassifier = null
+}
+sourcesJar {
+    archiveBaseName = rootProject.archives_name
+    archiveVersion = "${rootProject.mod_version}+${minecraft_version}-fabric"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from configurations.commonJava
+}

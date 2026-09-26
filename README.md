@@ -22,7 +22,7 @@ on first run:
 - `/justrecipeunlocker unlockAll`, unlock recipes for all online players (op level 2)
 - `/jru`, alias for `/justrecipeunlocker`
 
-Currently supports Minecraft 1.21.1 on Fabric and NeoForge.
+Currently supports Minecraft 1.21.1, 26.1.2, 26.2, and 26.3 on Fabric and NeoForge.
 
 ## License
 

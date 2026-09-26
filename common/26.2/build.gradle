@@ -1,0 +1,92 @@
+plugins {
+    // Minecraft 26.2 ships unobfuscated: the legacy 'fabric-loom' plugin cannot resolve
+    // mappings for it (there are none). Use Fabric's new no-remap toolchain plugin instead.
+    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+}
+
+// Exposes this module's Java sources and resources as consumable configurations so
+// that platform modules (e.g. fabric) can compile them directly into their own jar,
+// instead of depending on a separate common.jar at runtime.
+configurations {
+    commonJava {
+        canBeConsumed = true
+        canBeResolved = false
+    }
+    commonResources {
+        canBeConsumed = true
+        canBeResolved = false
+    }
+    // Shared GameTest logic (net.minecraft.gametest.framework + vanilla classes only, no
+    // Fabric/NeoForge-specific imports), consumed by both platform modules the same way
+    // commonJava/commonResources are.
+    gametestJava {
+        canBeConsumed = true
+        canBeResolved = false
+    }
+    gametestResources {
+        canBeConsumed = true
+        canBeResolved = false
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir '../shared/src/main/java'
+        }
+        resources {
+            srcDir '../shared/src/main/resources'
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+            srcDir '../shared/src/test/java'
+        }
+    }
+    gametest {
+        java {
+            srcDir 'src/gametest/java'
+        }
+        resources {
+            srcDir 'src/gametest/resources'
+        }
+        // Reuse main's already-wired classpath (Minecraft + mappings + production classes)
+        // instead of re-deriving Loom's configuration wiring for a brand-new source set.
+        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+
+    compileOnly "com.electronwill.night-config:core:3.8.3"
+    compileOnly "com.electronwill.night-config:toml:3.8.3"
+
+    testImplementation platform('org.junit:junit-bom:5.11.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation "com.electronwill.night-config:core:3.8.3"
+    testImplementation "com.electronwill.night-config:toml:3.8.3"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+artifacts {
+    sourceSets.main.java.srcDirs.each { dir ->
+        add('commonJava', dir)
+    }
+    sourceSets.main.resources.srcDirs.each { dir ->
+        add('commonResources', dir)
+    }
+    sourceSets.gametest.java.srcDirs.each { dir ->
+        add('gametestJava', dir)
+    }
+    sourceSets.gametest.resources.srcDirs.each { dir ->
+        add('gametestResources', dir)
+    }
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "justrecipeunlocker",
+  "version": "${version}",
+  "name": "Just Recipe Unlocker",
+  "description": "Unlocks all crafting recipes for players on join.",
+  "authors": [],
+  "license": "LGPL-3.0-only",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.justrecipeunlocker.fabric.JustRecipeUnlockerFabric"]
+  },
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
